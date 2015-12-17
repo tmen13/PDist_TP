@@ -138,7 +138,7 @@ public class DirectoryService {
 							IPplusPort.append(servers.get(NextServerSendPos).getAddress().getHostAddress());
 							IPplusPort.append(":");
 							IPplusPort.append(servers.get(NextServerSendPos).getPort());
-							
+
 							SendUDPMessage(packet,socket,IPplusPort.toString());
 						}
 
@@ -209,12 +209,12 @@ public class DirectoryService {
 		}
 		return servers;     	
 	}
-	
+
 	public static int getHoraDirectoriaEmSeg(){
 		Calendar data = Calendar.getInstance();
-        return (data.get(Calendar.HOUR_OF_DAY) * 60) * 60 +
-                data.get(Calendar.MINUTE) * 60 +
-                data.get(Calendar.SECOND);
+		return (data.get(Calendar.HOUR_OF_DAY) * 60) * 60 +
+				data.get(Calendar.MINUTE) * 60 +
+				data.get(Calendar.SECOND);
 	}
 
 }

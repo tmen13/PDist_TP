@@ -77,12 +77,6 @@ public class Client {
        *
        */
 
-      try {
-        socketServer = new Socket(ServerIP, ServerPort);
-      } catch (IOException e) {
-        e.toString();
-      }
-
       while (ClientActive) {
         System.out.println("\n\n\nLista de comandos:");
         System.out.println("\"dir\" - Listar ficheiros");
@@ -97,7 +91,7 @@ public class Client {
         switch (cmd) {
         case "dir":
           mensagemTCP = new MensagemTCP("dir");
-          MensagemTCP(mensagemTCP, socketServer, ServerPort);
+          MensagemTCP(mensagemTCP, socketServer);
           System.out.println("Pedir lista de ficheiros");
           break;
         case "logout":
@@ -116,20 +110,20 @@ public class Client {
         case "down":
           filename = sc.nextLine();
           mensagemTCP = new MensagemTCP("down", new FileDir(filename));
-          MensagemTCP(mensagemTCP, socketServer, ServerPort);
+          MensagemTCP(mensagemTCP, socketServer);
           break;
         case "up":
           filename = sc.nextLine();
           mensagemTCP = new MensagemTCP("up", new FileDir(filename));
-          MensagemTCP(mensagemTCP, socketServer, ServerPort);
+          MensagemTCP(mensagemTCP, socketServer);
           break;
         case "del":
           filename = sc.nextLine();
           mensagemTCP = new MensagemTCP("del", new FileDir(filename));
-          MensagemTCP(mensagemTCP, socketServer, ServerPort);
+          MensagemTCP(mensagemTCP, socketServer);
           break;
         default:
-          return;
+          continue;
         }
       }
 
@@ -146,7 +140,7 @@ public class Client {
     return;
   }
 
-  public static void MensagemTCP(MensagemTCP mensagem, Socket socket, int PortLigacao) {
+  public static void MensagemTCP(MensagemTCP mensagem, Socket socket) {
 
     try {
       // InputStream in = new ObjectInputStream(socket.getInputStream());
@@ -183,6 +177,13 @@ public class Client {
       ServerIP = tokens.nextToken();
       ServerPort = Integer.parseInt(tokens.nextToken());
       System.out.println("Recebi PacketUDP com o endereço do servidor (" + ServerIP + ":" + ServerPort + ")");
+      
+      try {
+        socketServer = new Socket(ServerIP, 7001);
+        System.out.println("Socket TCP preenchido");
+      } catch (IOException e) {
+        System.out.print(e.toString());
+      }
 
     } catch (SocketException e) {
       ClientActive = false;

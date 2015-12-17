@@ -14,7 +14,7 @@ class HeartBeats extends Thread {
 	public int PortoDeEscuta;
 
 	public HeartBeats(int PORT_SERVICEDIRECTORY,int port) {
-		this.PortoDeEscuta=port;
+		this.PortoDeEscuta = port;
 		pkt = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
 		FailtHeartBeats=0;
 		this.PORT_SERVICEDIRECTORY = PORT_SERVICEDIRECTORY;
@@ -85,8 +85,5 @@ class HeartBeats extends Thread {
 			}
 		}
 		System.out.println("System shutdown");
-
-
 	}
 }
-
