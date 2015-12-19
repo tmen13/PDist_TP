@@ -179,7 +179,7 @@ public class Client {
       System.out.println("Recebi PacketUDP com o endereço do servidor (" + ServerIP + ":" + ServerPort + ")");
       
       try {
-        socketServer = new Socket(ServerIP, 7001);
+        socketServer = new Socket(ServerIP, ServerPort);
         System.out.println("Socket TCP preenchido");
       } catch (IOException e) {
         System.out.print(e.toString());
