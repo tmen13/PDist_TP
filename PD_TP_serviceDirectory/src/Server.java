@@ -5,6 +5,19 @@ class Server {
     private InetAddress address;
     private int port;
     private boolean primario = false;
+	private boolean serverConnected = false;
+    private Calendar data;
+	private int segundos;
+
+    public Server(int port, InetAddress inetAddress) {
+        this.port = port;
+        this.address = inetAddress;
+        this.data = Calendar.getInstance();
+        segundos = (data.get(Calendar.HOUR_OF_DAY) * 60) * 60 +
+                data.get(Calendar.MINUTE) * 60 +
+                data.get(Calendar.SECOND);
+    }
+    
     public boolean isPrimario() {
 		return primario;
 	}
@@ -24,19 +37,6 @@ class Server {
 	public void setSegundos(int segundos) {
 		this.segundos = segundos;
 	}
-
-	private boolean serverConnected = false;
-    private Calendar data;
-	private int segundos;
-
-    public Server(int port, InetAddress inetAddress) {
-        this.port = port;
-        this.address = inetAddress;
-        this.data = Calendar.getInstance();
-        segundos = (data.get(Calendar.HOUR_OF_DAY) * 60) * 60 +
-                data.get(Calendar.MINUTE) * 60 +
-                data.get(Calendar.SECOND);
-    }
     
 	public boolean isServerConnected() {
 		return serverConnected;

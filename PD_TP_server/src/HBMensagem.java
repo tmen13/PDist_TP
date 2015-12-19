@@ -45,4 +45,12 @@ public class HBMensagem implements Serializable {
     public int horaEmSegundos(){
         return segundos;
     }
+
+	public int getPortoEscuta() {
+		return portoEscuta;
+	}
+
+	public void setPortoEscuta(int portoEscuta) {
+		this.portoEscuta = portoEscuta;
+	}
 }

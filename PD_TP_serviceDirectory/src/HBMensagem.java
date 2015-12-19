@@ -7,8 +7,10 @@ public class HBMensagem implements Serializable {
     protected  int primario;
     protected Calendar data;
     protected int segundos;
+    protected int portoEscuta;
 
-    public HBMensagem(String mensagem) {
+    public HBMensagem(String mensagem,int port) {
+    	this.portoEscuta = port;
         this.mensagem = mensagem;
         this.primario = -1;
         this.data = Calendar.getInstance();
@@ -43,4 +45,12 @@ public class HBMensagem implements Serializable {
     public int horaEmSegundos(){
         return segundos;
     }
+
+	public int getPortoEscuta() {
+		return portoEscuta;
+	}
+
+	public void setPortoEscuta(int portoEscuta) {
+		this.portoEscuta = portoEscuta;
+	}
 }

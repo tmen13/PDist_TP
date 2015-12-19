@@ -138,13 +138,14 @@ public class DirectoryService {
 							IPplusPort.append(servers.get(NextServerSendPos).getAddress().getHostAddress());
 							IPplusPort.append(":");
 							IPplusPort.append(servers.get(NextServerSendPos).getPort());
-
+							IPplusPort.toString();
 							SendUDPMessage(packet,socket,IPplusPort.toString());
 						}
 
 					} else if (obj instanceof HBMensagem) {
-						System.out.println("Recebi Mensagem do tipo HeartBeat:"+ packet.getPort());
-						Server srv = new Server(packet.getPort(), packet.getAddress());
+						HBMensagem msg = (HBMensagem) obj;
+						System.out.println("Recebi Mensagem do tipo HeartBeat:" + packet.getAddress() + msg.getPortoEscuta());
+						Server srv = new Server(msg.getPortoEscuta(), packet.getAddress());
 
 						if(!searchServer(servers,srv)){ //adicionar servidor Activo
 							if(servers.isEmpty())
@@ -154,7 +155,7 @@ public class DirectoryService {
 
 						//O serviço de directorias verifica o tempo dos HeartBeats 
 						//dos servidores quando tem que ir la mexer no array para atribuir um port ao cliente
-						HBMensagem msg = (HBMensagem) obj;
+						
 						msg.setSegundos(getHoraDirectoriaEmSeg());
 
 						if((srv.horaEmSegundos()-msg.horaEmSegundos())>15){
@@ -170,7 +171,7 @@ public class DirectoryService {
 								System.out.println("vou atualizar tudo");
 								servers = atualizaServersHB(servers);
 								System.out.println("HeartBeat:\n" + "From: " + packet.getAddress()
-								+ ":" + packet.getPort() + " - " + msg.getMensagem());
+								+ ":" + msg.getPortoEscuta() + " - " + msg.getMensagem());
 								msg.setMensagem("HeartBeat recebido");
 								out.writeObject(msg);
 								out.flush();
