@@ -1,27 +1,42 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 
-public class MensagemTCP  implements Serializable{
-    static final long serialVersionUID = 2L;
-    protected String msg;
-    protected FileDir file;
+public class MensagemTCP implements Serializable {
+  static final long serialVersionUID = 2L;
+  protected String msg;
+  protected FileDir file;
+  protected ArrayList<String> listaFicheiros;
 
-    public MensagemTCP(String msg) {
-        this.msg = msg;
+  public MensagemTCP(String msg, FileDir file) {
+    this.msg = msg;
+    this.file = file;
+  }
+
+  public MensagemTCP(String string) {
+    this.msg = string;
+  }
+
+    public ArrayList<String>getListaFicheiros(){
+    	return listaFicheiros;
     }
 
-    public String getMsg() {
-        return msg;
+    public void setListaFicheiros(ArrayList<String> array){
+    	this.listaFicheiros = array;
     }
+  
+  public FileDir getFile() {
+    return file;
+  }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+  public String getMsg() {
+    return msg;
+  }
 
-    public FileDir getFile() {
-        return file;
-    }
+  public void setFile(FileDir file) {
+    this.file = file;
+  }
 
-    public void setFile(FileDir file) {
-        this.file = file;
-    }
+  public void setMsg(String msg) {
+    this.msg = msg;
+  }
 }

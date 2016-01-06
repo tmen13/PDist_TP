@@ -162,13 +162,13 @@ public class DirectoryService {
 							System.out.println("passaram 15s");
 							servers.remove(srv);
 						} else {
-							System.out.println(srv.horaEmSegundos() + ":" + msg.horaEmSegundos() + ":" + (srv.horaEmSegundos()-msg.horaEmSegundos()));
+							//System.out.println(srv.horaEmSegundos() + ":" + msg.horaEmSegundos() + ":" + (srv.horaEmSegundos()-msg.horaEmSegundos()));
 							if((srv.horaEmSegundos()-msg.horaEmSegundos())>5){// se passou mais de 5s, perde um periodo
 								contaHB++;
 								System.out.println("Passaram 5s. contaHB: " + contaHB);
 							}
 							if(contaHB < 3){
-								System.out.println("vou atualizar tudo");
+								//System.out.println("vou atualizar tudo");
 								servers = atualizaServersHB(servers);
 								System.out.println("HeartBeat:\n" + "From: " + packet.getAddress()
 								+ ":" + msg.getPortoEscuta() + " - " + msg.getMensagem());
@@ -179,7 +179,7 @@ public class DirectoryService {
 								packet = new DatagramPacket(bOut.toByteArray(), bOut.size(), group, ListeningPort);
 								socket.send(packet);
 								socket.receive(packet); // recebe a propria mensagem
-								System.out.println("contaHB: " + contaHB);
+								//System.out.println("contaHB: " + contaHB);
 								contaHB = 0; //recebeu HB com sucesso, reset contador
 							} else {
 								System.out.println("Passaram 3 periodos, vai remover server. contaHB: " + contaHB);

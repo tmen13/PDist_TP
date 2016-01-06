@@ -19,6 +19,7 @@ public class Client {
   public static int ServerPort;
   public static String ServerIP;
   public static Socket socketServer;
+  public static ArrayList<String> ficheirosDisponiveis;
 
   public static void recebeFicheiro(String filename){
     File f, localDirectory;
@@ -162,25 +163,33 @@ public class Client {
       if (requestedFileInputStream != null) {
         try {
           requestedFileInputStream.close();
-        } catch (IOException ex) {}
+        } catch (IOException ex) {
+          ex.printStackTrace();
+        }
       }
     }
   } //TESTAR
 
   public static void recebeListaFicheiros(){
-    ObjectInputStream input;
-    ArrayList<String> listaFicheiros = null;
-
+    ObjectInputStream ois = null;
     try {
-      input = new ObjectInputStream(socketServer.getInputStream());
-      listaFicheiros = (ArrayList<String>)input.readObject();
-      imprimeListaFicheiros(listaFicheiros);
-    }catch (Exception e){}
+      ois = new ObjectInputStream(socketServer.getInputStream());
+      Object o = null;
+      o = ois.readObject();
+      System.out.println(ois.getClass());
+      MensagemTCP msg = (MensagemTCP)o;
+
+      //ficheirosDisponiveis = msg.getListaFicheiros();
+      imprimeListaFicheiros(msg.getListaFicheiros());
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+
   } //TESTAR
 
   public static void imprimeListaFicheiros(ArrayList<String> listaFicheiros){
     if(listaFicheiros.size() == 0)
-      System.out.println("/n Sem ficheiros no servidor");
+      System.out.println("Sem ficheiros no servidor");
     else {
       for (int i = 0; i <listaFicheiros.size() ; i++) {
         System.out.println(listaFicheiros.get(i));
@@ -269,7 +278,7 @@ public class Client {
           mensagemTCP = new MensagemTCP("dir");
           MensagemTCP(mensagemTCP, socketServer);
           System.out.println("Pedir lista de ficheiros");
-          //recebeListaFicheiros();
+          recebeListaFicheiros();
           break;
         case "logout":
           ClientActive = false;
@@ -305,15 +314,10 @@ public class Client {
           continue;
         }
       }
-
+      sc.close();
     } catch (SocketException e) {
       e.printStackTrace();
-    } finally {
-      if (sc != null) {
-        sc.close();
-      }
-    }
-
+    } 
     //    limpaFicheiros();
     System.out.print("Aplicacao vai desligar-se");
     return;
@@ -322,7 +326,6 @@ public class Client {
   public static void MensagemTCP(MensagemTCP mensagem, Socket socket) {
 
     try {
-      // InputStream in = new ObjectInputStream(socket.getInputStream());
       ObjectOutput out = new ObjectOutputStream(socket.getOutputStream());
       out.writeObject(mensagem);
       out.flush();
