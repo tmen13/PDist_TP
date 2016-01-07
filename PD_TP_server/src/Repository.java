@@ -130,11 +130,13 @@ public class Repository extends Thread {
 			requestedFileInputStream = new FileInputStream(requestedCanonicalFilePath);
 			System.out.println("Ficheiro " + requestedCanonicalFilePath + " aberto para leitura.");
 
-			while ((nbytes = requestedFileInputStream.read(fileChunk)) > 0 ) {
+			out.flush();
+			while((nbytes = requestedFileInputStream.read(fileChunk)) > 0) {
 				out.write(fileChunk, 0, nbytes);
 				out.flush();
 			}
-			out.close();
+			out.write("/end/".getBytes());
+
 			System.out.println("Transferencia concluida");
 
 		} catch (FileNotFoundException e) {
@@ -150,19 +152,15 @@ public class Repository extends Thread {
 				}
 			}
 		}
-
-
-	} //TESTAR
+	} //FUNCIONA
 
 	public void recebeFicheiro(String filename){
 		String localFilePath = null;
 		FileOutputStream localFileOutputStream = null;
-		PrintWriter pout;
 		InputStream in;
 		byte []fileChunk = new byte[4000];
 		int nbytes;
-		int timeout = 5; //segundos
-		File f;
+		int timeout = 5; //Segundos
 
 
 		if (!directory.exists()){
@@ -182,8 +180,8 @@ public class Repository extends Thread {
 
 		try{
 			try{
-				localFilePath = directory.getCanonicalPath() + File.separator + filename;
 
+				localFilePath = directory.getCanonicalPath() + File.separator + filename;
 				localFileOutputStream = new FileOutputStream(localFilePath);
 				System.out.println("Ficheiro " + localFilePath + " criado.");
 
@@ -194,19 +192,25 @@ public class Repository extends Thread {
 				}else{
 					System.out.println("Ocorreu a excepcao {" + e +"} ao tentar criar o ficheiro " + localFilePath + "!");
 				}
+
 				return;
 			}
 
 			try{
 
 				client.setSoTimeout(timeout*1000);
-
 				in = client.getInputStream();
 
+				localFileOutputStream.flush();
+
 				while((nbytes = in.read(fileChunk)) > 0) {
+					if(new String(fileChunk).contains("/end/"))
+						break;
 					localFileOutputStream.write(fileChunk, 0, nbytes);
+					localFileOutputStream.flush();
 				}
-				in.close();
+
+
 			}catch(UnknownHostException e){
 				System.out.println("Destino desconhecido:\n\t"+e);
 			}catch(NumberFormatException e){
@@ -217,18 +221,27 @@ public class Repository extends Thread {
 				System.out.println("Ocorreu um erro ao nível do socket TCP:\n\t"+e);
 			}catch(IOException e){
 				System.out.println("Ocorreu um erro no acesso ao socket ou ao ficheiro local " + localFilePath +":\n\t"+e);
+			}finally{
+				if(localFileOutputStream != null){
+					try{
+						localFileOutputStream.close();
+					}catch(IOException e){
+						System.out.println("Erro no FileOutputStream");
+					}
+				}
 			}
 
 		}finally{
-
 			if(localFileOutputStream != null){
 				try{
 					localFileOutputStream.close();
-				}catch(IOException e){}
+				}catch(IOException e){
+					System.out.println("Erro no FileOutputStream");
+				}
 			}
 		}
 
-	} //TESTAR
+	} //FUNCIONA
 
 	void apagaFicheiro(String filename){
 		String localFilePath = null;
@@ -272,16 +285,16 @@ public class Repository extends Thread {
 			enviaListaFicheiros();
 			break;
 		case  "down":
-			System.out.println("Download: " + msg.getFile().getFileName());
+			System.out.println("Download: " + msg.getFile());
 			//enviaFicheiro("pa.png");
 			break;
 		case "up":
-			System.out.println("Upload: " + msg.getFile().getFileName());
+			System.out.println("Upload: " + msg.getFile());
 			recebeFicheiro("pa.png");
 			break;
 		case "del":
-			System.out.println("Delete: " + msg.getFile().getFileName());
-			apagaFicheiro(msg.getFile().getFileName());
+			System.out.println("Delete: " + msg.getFile());
+			apagaFicheiro(msg.getFile());
 			break;
 		}
 	}

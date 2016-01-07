@@ -4,6 +4,7 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
 
@@ -22,12 +23,26 @@ public class Client {
   public static ArrayList<String> ficheirosDisponiveis;
   protected static ObjectInputStream in;
   protected static ObjectOutputStream out;
+  
+  public static boolean verificaFicheiro(String filename){
+    File f, localDirectory;
+    boolean exists = false;
+
+    localDirectory = new File(DIR);
+      try {
+          f = new File(localDirectory.getCanonicalPath() + File.separator + filename);
+          exists = f.exists();
+      }catch (IOException e){
+          System.out.println("Erro a verificar existencia do ficheiro");
+      }
+
+      return exists;
+  } //FUNCIONA
 
   public static void recebeFicheiro(String filename){
-    File f, localDirectory;
+    File localDirectory;
     String localFilePath = null;
     FileOutputStream localFileOutputStream = null;
-    PrintWriter pout;
     InputStream in;
     byte []fileChunk = new byte[4000];
     int nbytes;
@@ -53,10 +68,6 @@ public class Client {
     try{
       try{
 
-        f = new File(localFilePath);
-        if (f.exists())
-          return;
-
         localFilePath = localDirectory.getCanonicalPath() + File.separator + filename;
         localFileOutputStream = new FileOutputStream(localFilePath);
         System.out.println("Ficheiro " + localFilePath + " criado.");
@@ -75,16 +86,18 @@ public class Client {
       try{
 
         socketServer.setSoTimeout(timeout*1000);
-
         in = socketServer.getInputStream();
 
-        pout = new PrintWriter(socketServer.getOutputStream(), true);
-        pout.println(filename);
-        pout.flush();
+          localFileOutputStream.flush();
+          in.read(new byte[4]);
 
-        while((nbytes = in.read(fileChunk)) > 0) {
-          localFileOutputStream.write(fileChunk, 0, nbytes);
-        }
+          while((nbytes = in.read(fileChunk)) > 0) {
+              if(new String(fileChunk).contains("/end/"))
+                  break;
+              localFileOutputStream.write(fileChunk, 0, nbytes);
+              localFileOutputStream.flush();
+          }
+
 
       }catch(UnknownHostException e){
         System.out.println("Destino desconhecido:\n\t"+e);
@@ -96,18 +109,28 @@ public class Client {
         System.out.println("Ocorreu um erro ao nível do socket TCP:\n\t"+e);
       }catch(IOException e){
         System.out.println("Ocorreu um erro no acesso ao socket ou ao ficheiro local " + localFilePath +":\n\t"+e);
+      }finally{
+        if(localFileOutputStream != null){
+          try{
+            localFileOutputStream.close();
+          }catch(IOException e){
+            System.out.println("Erro no FileOutputStream");
+          }
+        }
       }
 
     }finally{
       if(localFileOutputStream != null){
         try{
           localFileOutputStream.close();
-        }catch(IOException e){}
+        }catch(IOException e){
+          System.out.println("Erro no FileOutputStream");
+        }
       }
     }
 
-  } //TESTAR E VERIFICAR PRINTWRITER
-
+  } //FUNCIONA
+  
   public static void enviaFicheiro(String filename){
     OutputStream out;
 
@@ -119,57 +142,59 @@ public class Client {
 
     File directory = new File(DIR);
 
-    if (!directory.exists()){
-      System.out.println("A directoria " + directory + " nao existe!");
-      return;
-    }
-
-    if(!directory.isDirectory()){
-      System.out.println("O caminho " + directory + " nao se refere a uma directoria!");
-      return;
-    }
-
-    if (directory.canRead()){
-      System.out.println("Sem permissoes de leitura na directoria " + directory + "!");
-      return;
-    }
-
-    try {
-      socketServer.setSoTimeout(timeout * 1000);
-
-      out = socketServer.getOutputStream();
-
-      requestedCanonicalFilePath = new File(directory + File.separator + filename).getCanonicalPath();
-
-      if (!requestedCanonicalFilePath.startsWith(directory.getCanonicalPath() + File.separator)) {
-        System.out.println("Nao e' permitido aceder ao ficheiro " + requestedCanonicalFilePath + "!");
-        System.out.println("A directoria de base nao corresponde a " + directory.getCanonicalPath() + "!");
-        return;
+      if (!directory.exists()){
+          System.out.println("A directoria " + directory + " nao existe!");
+          return;
       }
 
-      requestedFileInputStream = new FileInputStream(requestedCanonicalFilePath);
-      System.out.println("Ficheiro " + requestedCanonicalFilePath + " aberto para leitura.");
-
-      while ((nbytes = requestedFileInputStream.read(fileChunk)) > 0) {
-        out.write(fileChunk, 0, nbytes);
-        out.flush();
+      if(!directory.isDirectory()){
+          System.out.println("O caminho " + directory + " nao se refere a uma directoria!");
+          return;
       }
 
-      System.out.println("Transferencia concluida");
-
-    } catch (FileNotFoundException e) {
-      System.out.println("Ocorreu a excepcao {" + e + "} ao tentar abrir o ficheiro " + requestedCanonicalFilePath + "!");
-    } catch (IOException e) {
-      System.out.println("Ocorreu a excepcao de E/S: \n\t" + e);
-    } finally {
-      if (requestedFileInputStream != null) {
-        try {
-          requestedFileInputStream.close();
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
+      if (!directory.canRead()){
+          System.out.println("Sem permissoes de leitura na directoria " + directory + "!");
+          return;
       }
-    }
+
+      try {
+          socketServer.setSoTimeout(timeout * 1000);
+
+          out = socketServer.getOutputStream();
+
+          requestedCanonicalFilePath = new File(directory + File.separator + filename).getCanonicalPath();
+
+          if (!requestedCanonicalFilePath.startsWith(directory.getCanonicalPath() + File.separator)) {
+              System.out.println("Nao e' permitido aceder ao ficheiro " + requestedCanonicalFilePath + "!");
+              System.out.println("A directoria de base nao corresponde a " + directory.getCanonicalPath() + "!");
+              return;
+          }
+
+          requestedFileInputStream = new FileInputStream(requestedCanonicalFilePath);
+          System.out.println("Ficheiro " + requestedCanonicalFilePath + " aberto para leitura.");
+
+          out.flush();
+          while((nbytes = requestedFileInputStream.read(fileChunk)) > 0) {
+              out.write(fileChunk, 0, nbytes);
+              out.flush();
+          }
+          out.write("/end/".getBytes());
+
+          System.out.println("Transferencia concluida");
+
+      } catch (FileNotFoundException e) {
+          System.out.println("Ocorreu a excepcao {" + e + "} ao tentar abrir o ficheiro " + requestedCanonicalFilePath + "!");
+      } catch (IOException e) {
+          System.out.println("Ocorreu a excepcao de E/S: \n\t" + e);
+      } finally {
+          if (requestedFileInputStream != null) {
+              try {
+                  requestedFileInputStream.close();
+              } catch (IOException ex) {
+                  System.out.println("Erro ao fechar o FileInputStream");
+              }
+          }
+      }
   } //TESTAR
 
   public static void recebeListaFicheiros(){
@@ -279,8 +304,8 @@ public class Client {
         case "dir":
           mensagemTCP = new MensagemTCP("dir");
           MensagemTCP(mensagemTCP, socketServer);
-          System.out.println("Pedir lista de ficheiros");
           recebeListaFicheiros();
+          System.out.println("Pedir lista de ficheiros");
           break;
         case "logout":
           ClientActive = false;
@@ -297,25 +322,33 @@ public class Client {
           return;
         case "down":
           filename = sc.nextLine();
-          mensagemTCP = new MensagemTCP("down", new FileDir(filename));
-          MensagemTCP(mensagemTCP, socketServer);
-          recebeFicheiro(filename);
+          if(verificaFicheiro(filename) == false){
+            mensagemTCP = new MensagemTCP("down",filename);
+            MensagemTCP(mensagemTCP, socketServer);
+            recebeFicheiro(filename);
+          }
           break;
         case "up":
           filename = sc.nextLine();
-          mensagemTCP = new MensagemTCP("up", new FileDir(filename));
-          MensagemTCP(mensagemTCP, socketServer);
-          enviaFicheiro(filename);
+          if(verificaFicheiro(filename) == true){
+            mensagemTCP = new MensagemTCP("up",filename);
+            MensagemTCP(mensagemTCP, socketServer);
+            try{
+                TimeUnit.SECONDS.sleep(1);}
+            catch (Exception e){}
+            enviaFicheiro(filename);
+          }
           break;
         case "del":
           filename = sc.nextLine();
-          mensagemTCP = new MensagemTCP("del", new FileDir(filename));
+          mensagemTCP = new MensagemTCP("del", filename);
           MensagemTCP(mensagemTCP, socketServer);
           break;
         default:
           continue;
         }
       }
+      
       sc.close();
     } catch (SocketException e) {
       e.printStackTrace();
@@ -338,7 +371,6 @@ public class Client {
     }
   }
   
-
   public static void MensagemUDP(MensagemUDP mensagem, DatagramPacket packetUDP,
       DatagramSocket socketUDP) {
     // Object obj = null;
