@@ -12,23 +12,28 @@ public class Repository extends Thread {
 	protected Socket client;
 	protected MensagemTCP msg;
 	protected ArrayList<String> listaFicheiros;
-	public static File fileCliente = null;
+	protected static File fileCliente = null;
+	protected static ObjectInputStream in;
+	protected static ObjectOutputStream out;
+	protected static Object obj;
 
-	public Repository(File directory, int PORT, MensagemTCP msg,Socket client) {
+	/*public Repository(File directory, int PORT, MensagemTCP msg,Socket client) {
 		this.directory = directory;
 		this.PORT = PORT;
 		this.msg = msg;
 		this.client = client;
 		this.listaFicheiros = new ArrayList<String>();
-	}
+	} */
 
-	public Repository(File directory, FileDir localDirectory, int listeningPortTCP, MensagemTCP msg2, Socket client2) {
+	public Repository(File directory, FileDir localDirectory, int listeningPortTCP, MensagemTCP msg, Socket client, 
+			ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
 		this.dirFD = localDirectory;
 		this.PORT = listeningPortTCP;
-		this.msg = msg2;
-		this.client = client2;
+		this.msg = msg;
+		this.client = client;
 		this.listaFicheiros = new ArrayList<String>();
-
+		Repository.out = out;
+		Repository.in = in;
 		this.directory = directory;
 	}
 
@@ -75,10 +80,9 @@ public class Repository extends Thread {
 				aux.add(str);
 			}
 			msg.setListaFicheiros(aux);
-			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
-			oos.writeObject(msg);
-			oos.flush();
-			oos.close();
+			Repository.out.writeObject(msg);
+			Repository.out.flush();
+			//Repository.out.close();
 
 			System.out.println("Lista enviada");
 		}catch(IOException e){

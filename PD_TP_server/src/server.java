@@ -15,7 +15,7 @@ public class server{
 
 	public static void main(String[] args){
 		/*
-		 *Validação para o código INPUT dos args
+		 *Validaï¿½ï¿½o para o cï¿½digo INPUT dos args
 		 */
 		if (args.length != 2){
 			System.out.println("Erro#1 - Falta args");
@@ -33,7 +33,7 @@ public class server{
 		directory = new File(args[0].trim());
 		//
 
-		//TODO: Ver erro de verificação de ficheiros
+		//TODO: Ver erro de verificaï¿½ï¿½o de ficheiros
 		// if (!localDirectory.exists() || !localDirectory.isDirectory() || !localDirectory.canRead() || !localDirectory.canWrite()) {
 		//   System.out.println("Erro#2 - Erro na directoria");
 		//  return;
@@ -46,17 +46,17 @@ public class server{
 		threadHeartBeat.start();
 
 		/*
-		 *Lançar thread para atender client
+		 *Lanï¿½ar thread para atender client
 		 */
 		try{
 			server = new ServerSocket(ListeningPortTCP);
 			while(true) {
 				try {
 					try {
-						System.out.println("Espera da ligação de um cliente");
+						System.out.println("Espera da ligacao de um cliente");
 						client = server.accept();
 					} catch (IOException e) {
-						System.out.println("Erro enquanto aguarda por um pedido de ligação:\n\t" + e);
+						System.out.println("Erro enquanto aguarda por um pedido de ligaï¿½ï¿½o:\n\t" + e);
 						return;
 					}
 					System.out.println("Cliente Connectou-se");
@@ -66,7 +66,7 @@ public class server{
 					obj = in.readObject();
 
 					/*
-                    Validação para caso de enviar null como objecto.
+                    Validaï¿½ï¿½o para caso de enviar null como objecto.
 					 */
 
 					if (obj == null) {
@@ -81,9 +81,9 @@ public class server{
 						//System.out.println("Mensagem do Cliente - File: " + msg.getFile().getFileName());
 
 						//Criar uma thread para atender cada cliente
-						Thread threadRepository = new Repository(directory, localDirectory,ListeningPortTCP,msg,client);
+						Thread threadRepository = new Repository(directory, localDirectory,ListeningPortTCP,msg,client, in, out);
 						threadRepository.start();
-						client.shutdownInput(); // desliga a entrada de informação por parte do cliente
+						//client.shutdownInput(); // desliga a entrada de informaï¿½ï¿½o por parte do cliente
 					}
 
 				}catch(IOException e){

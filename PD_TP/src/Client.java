@@ -20,6 +20,8 @@ public class Client {
   public static String ServerIP;
   public static Socket socketServer;
   public static ArrayList<String> ficheirosDisponiveis;
+  protected static ObjectInputStream in;
+  protected static ObjectOutputStream out;
 
   public static void recebeFicheiro(String filename){
     File f, localDirectory;
@@ -171,13 +173,17 @@ public class Client {
   } //TESTAR
 
   public static void recebeListaFicheiros(){
-    ObjectInputStream ois = null;
+    MensagemTCP msg = null;
     try {
-      ois = new ObjectInputStream(socketServer.getInputStream());
+
       Object o = null;
-      o = ois.readObject();
-      System.out.println(ois.getClass());
-      MensagemTCP msg = (MensagemTCP)o;
+      o = Client.in.readObject();
+      if(o instanceof MensagemTCP){
+        System.out.println("È msgTCP");
+        msg = (MensagemTCP)o;
+      }
+      else
+        System.out.println("nao È msgTCP");
 
       //ficheirosDisponiveis = msg.getListaFicheiros();
       imprimeListaFicheiros(msg.getListaFicheiros());
@@ -252,15 +258,11 @@ public class Client {
       try {
         socketServer = new Socket(ServerIP, ServerPort);
         System.out.println("Socket TCP preenchido");
+        Client.in = new ObjectInputStream(socketServer.getInputStream());
+        Client.out = new ObjectOutputStream(socketServer.getOutputStream());
       } catch (IOException e) {
         System.out.print(e.toString());
       }
-
-      /*
-       * Comment: - Apartir daqui, iremos fazer a liga√ß√£o ao Servidor e poder fazer uma op√ßoes
-       * referidas em baixo - Lan√ßar uma thread para cada caso
-       *
-       */
 
       while (ClientActive) {
         System.out.println("\n\n\nLista de comandos:");
@@ -326,15 +328,16 @@ public class Client {
   public static void MensagemTCP(MensagemTCP mensagem, Socket socket) {
 
     try {
-      ObjectOutput out = new ObjectOutputStream(socket.getOutputStream());
-      out.writeObject(mensagem);
-      out.flush();
+     // ObjectOutput out = new ObjectOutputStream(socket.getOutputStream());
+      Client.out.writeObject(mensagem);
+      Client.out.flush();
       System.out.println("Mensagem foi enviada");
 
     } catch (IOException e) {
       System.out.println("Erro na tentativa de enviar mensagem TCP: " + e.toString());
     }
   }
+  
 
   public static void MensagemUDP(MensagemUDP mensagem, DatagramPacket packetUDP,
       DatagramSocket socketUDP) {
@@ -359,7 +362,7 @@ public class Client {
       ServerIP = tokens.nextToken();
       ServerPort = Integer.parseInt(tokens.nextToken());
       System.out.println("Recebi PacketUDP com o endereÁo do servidor (" + ServerIP + ":" + ServerPort + ")");
-
+      
     } catch (SocketException e) {
       ClientActive = false;
       System.out.println("timeout" + e.toString());
