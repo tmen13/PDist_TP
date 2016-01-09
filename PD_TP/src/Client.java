@@ -276,7 +276,7 @@ public class Client {
 
       mensagem = new MensagemUDP(user, password, "Login");
       MensagemUDP(mensagem, packet, socket);
-
+      System.out.println("A tentar ligar ao servidor servidor (" + ServerIP + ":" + ServerPort + ")");
       try {
         socketServer = new Socket(ServerIP, ServerPort);
         System.out.println("Socket TCP preenchido");
