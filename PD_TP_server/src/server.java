@@ -58,39 +58,17 @@ public class server{
 					}
 					System.out.println("Cliente Connectou-se");
 
-					/*out = new ObjectOutputStream(client.getOutputStream());
-					in = new ObjectInputStream(client.getInputStream());
-					obj = in.readObject();
-
-					/*
-                    Validação para caso de enviar null como objecto.
-
-
-					if (obj == null) {
-						System.out.println("Objecto null");
-						client.close();
-						continue;
-					}
-
-					if (obj instanceof MensagemTCP) {
-						MensagemTCP msg = (MensagemTCP) obj;
-						System.out.println("Mensagem do cliente: " + msg.getMsg());
-						System.out.println("Mensagem do cli fich " + msg.getFile());*/
-
-
-						//Criar uma thread para atender cada cliente
-						Thread threadRepository = new Repository(directory, localDirectory,ListeningPortTCP/*,msg*/,client);
-						threadRepository.start();
-						//client.shutdownInput(); // desliga a entrada de informação por parte do cliente
-						System.in.read();
+					//Criar uma thread para atender cada cliente
+					Thread threadRepository = new Repository(directory, localDirectory,ListeningPortTCP/*,msg*/,client);
+					threadRepository.start();
+					//client.shutdownInput(); // desliga a entrada de informação por parte do cliente
+					System.in.read();
 					//}
 
 				}catch(IOException e){
 					System.out.println(e);
 					client = null;
-				}/*catch(ClassNotFoundException e){
-					System.out.println(e);
-				}*/
+				}
 			}
 		}catch (IOException e){
 			System.out.println(e);

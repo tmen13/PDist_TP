@@ -144,7 +144,7 @@ public class DirectoryService {
 
 					} else if (obj instanceof HBMensagem) {
 						HBMensagem msg = (HBMensagem) obj;
-						System.out.println("Recebi Mensagem do tipo HeartBeat:" + packet.getAddress() + msg.getPortoEscuta());
+						System.out.println("Recebi Mensagem do tipo HeartBeat:" + packet.getAddress() + ":" + msg.getPortoEscuta());
 						Server srv = new Server(msg.getPortoEscuta(), packet.getAddress());
 
 						if(!searchServer(servers,srv)){ //adicionar servidor Activo
@@ -179,16 +179,15 @@ public class DirectoryService {
 								packet = new DatagramPacket(bOut.toByteArray(), bOut.size(), group, ListeningPort);
 								socket.send(packet);
 								socket.receive(packet); // recebe a propria mensagem
-								//System.out.println("contaHB: " + contaHB);
 								contaHB = 0; //recebeu HB com sucesso, reset contador
 							} else {
-								System.out.println("Passaram 3 periodos, vai remover server. contaHB: " + contaHB);
+								System.out.println("Passaram 3 periodos, vai remover server.");
 								servers.remove(srv); //passaram 3 periodos, remove servidor
 							}
 						}
 					}
 				} catch (ClassNotFoundException e) {
-					System.out.println("Mensagem recebida de um tipo inesperado" + e.toString());
+					//System.out.println("Mensagem recebida de um tipo inesperado" + e.toString());
 				} catch (IOException e) {
 					System.out.println("Impossibilidade de aceder ao conteudo da mensagem recebida!" + e.toString());
 				}
