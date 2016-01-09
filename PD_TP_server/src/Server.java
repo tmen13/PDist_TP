@@ -2,7 +2,7 @@ import  java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class server{
+public class Server{
 	private static int PORT;
 	private static FileDir localDirectory;
 	private static int ListeningPortTCP = 7001;
