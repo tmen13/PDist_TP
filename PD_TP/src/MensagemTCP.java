@@ -4,10 +4,11 @@ import java.util.ArrayList;
 public class MensagemTCP implements Serializable {
   static final long serialVersionUID = 2L;
   protected String msg;
-  protected FileDir file;
+  protected String file;
+  public String ficheiro;
   protected ArrayList<String> listaFicheiros;
 
-  public MensagemTCP(String msg, FileDir file) {
+  public MensagemTCP(String msg, String file) {
     this.msg = msg;
     this.file = file;
   }
@@ -24,7 +25,7 @@ public class MensagemTCP implements Serializable {
     	this.listaFicheiros = array;
     }
   
-  public FileDir getFile() {
+  public String getFile() {
     return file;
   }
 
@@ -32,7 +33,7 @@ public class MensagemTCP implements Serializable {
     return msg;
   }
 
-  public void setFile(FileDir file) {
+  public void setFile(String file) {
     this.file = file;
   }
 
