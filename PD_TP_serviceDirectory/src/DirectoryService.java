@@ -5,7 +5,7 @@ import java.net.*;
 
 public class DirectoryService {
 
-	public static final  int ListeningPort = 7000;
+	public static final int ListeningPort = 7000;
 	public static final String ListeningAddressGroup = "225.15.15.15";
 	public static final String FileLAuthentication = "UserLogin.txt";
 	public static final String loginDirectory = "logins";

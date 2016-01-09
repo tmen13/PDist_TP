@@ -282,6 +282,7 @@ public class Client {
         System.out.println("Socket TCP preenchido");
       } catch (IOException e) {
         System.out.print(e.toString());
+        return;
       }
 
       /*
