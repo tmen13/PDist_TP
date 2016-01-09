@@ -15,7 +15,7 @@ public class server{
 
 	public static void main(String[] args){
 		/*
-		 *Valida��o para o c�digo INPUT dos args
+		 *Validação para o código INPUT dos args
 		 */
 		if (args.length != 2){
 			System.out.println("Erro#1 - Falta args");
@@ -25,15 +25,12 @@ public class server{
 		PORT = Integer.parseInt(args[1]);
 		ServerSocket server; //TCP
 		Socket client;
-		ObjectInputStream in;
-		ObjectOutputStream out;
-		Object obj;
 
 		//28_12
 		directory = new File(args[0].trim());
 		//
 
-		//TODO: Ver erro de verifica��o de ficheiros
+		//TODO: Ver erro de verificação de ficheiros
 		// if (!localDirectory.exists() || !localDirectory.isDirectory() || !localDirectory.canRead() || !localDirectory.canWrite()) {
 		//   System.out.println("Erro#2 - Erro na directoria");
 		//  return;
@@ -46,7 +43,7 @@ public class server{
 		threadHeartBeat.start();
 
 		/*
-		 *Lan�ar thread para atender client
+		 *Lançar thread para atender client
 		 */
 		try{
 			server = new ServerSocket(ListeningPortTCP);
@@ -56,18 +53,18 @@ public class server{
 						System.out.println("Espera da ligacao de um cliente");
 						client = server.accept();
 					} catch (IOException e) {
-						System.out.println("Erro enquanto aguarda por um pedido de liga��o:\n\t" + e);
+						System.out.println("Erro enquanto aguarda por um pedido de ligacao:\n\t" + e);
 						return;
 					}
 					System.out.println("Cliente Connectou-se");
 
-					out = new ObjectOutputStream(client.getOutputStream());
+					/*out = new ObjectOutputStream(client.getOutputStream());
 					in = new ObjectInputStream(client.getInputStream());
 					obj = in.readObject();
 
 					/*
-                    Valida��o para caso de enviar null como objecto.
-					 */
+                    Validação para caso de enviar null como objecto.
+
 
 					if (obj == null) {
 						System.out.println("Objecto null");
@@ -78,20 +75,22 @@ public class server{
 					if (obj instanceof MensagemTCP) {
 						MensagemTCP msg = (MensagemTCP) obj;
 						System.out.println("Mensagem do cliente: " + msg.getMsg());
-						//System.out.println("Mensagem do Cliente - File: " + msg.getFile().getFileName());
+						System.out.println("Mensagem do cli fich " + msg.getFile());*/
+
 
 						//Criar uma thread para atender cada cliente
-						Thread threadRepository = new Repository(directory, localDirectory,ListeningPortTCP,msg,client, in, out);
+						Thread threadRepository = new Repository(directory, localDirectory,ListeningPortTCP/*,msg*/,client);
 						threadRepository.start();
-						//client.shutdownInput(); // desliga a entrada de informa��o por parte do cliente
-					}
+						//client.shutdownInput(); // desliga a entrada de informação por parte do cliente
+						System.in.read();
+					//}
 
 				}catch(IOException e){
 					System.out.println(e);
 					client = null;
-				}catch(ClassNotFoundException e){
+				}/*catch(ClassNotFoundException e){
 					System.out.println(e);
-				}
+				}*/
 			}
 		}catch (IOException e){
 			System.out.println(e);
